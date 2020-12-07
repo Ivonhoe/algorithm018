@@ -44,10 +44,68 @@
 using namespace std;
 
 //leetcode submit region begin(Prohibit modification and deletion)
+
+// 并查集的简单实现
+class UnionFind {
+private:
+    vector<int> parents;
+    int count;
+
+public:
+    UnionFind(int n) {
+        count = n;
+        parents = vector<int>(n);
+        for (int i = 0; i < n; i++) {
+            parents[i] = i;
+        }
+    }
+
+    int find(int x) {
+        while (parents[x] != x) {
+            x = parents[x];
+        }
+        return x;
+    }
+
+    // 先不考虑按秩合并（merge by rank）
+    void merge(
+            const int a,
+            const int b
+    ) {
+        if (a == b) return; // 自已和自已合并?????
+
+        const int pa = find(a);
+        const int pb = find(b);
+        if (pa == pb) return; // a and b 已经在同一集合(set)/簇(cluster)/连通分量(connected components)里!
+
+        parents[pb] = pa;
+        --count;
+    }
+
+    int getCount() {
+        return count;
+    }
+
+
+};
+
 class Solution {
 public:
     int findCircleNum(vector<vector<int>> &M) {
-        return solution1(M);
+        return solution2(M);
+    }
+
+    int solution2(vector<vector<int>> &M) {
+        UnionFind *unionFind = new UnionFind(M.size());
+        for (int i = 0; i < M.size(); i++) {
+            for (int j = 0; j < M.size(); j++) {
+                if (M[i][j] == 1) {
+                    unionFind->merge(i, j);
+                }
+            }
+        }
+
+        return unionFind->getCount();
     }
 
     // dfs
